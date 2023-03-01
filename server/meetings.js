@@ -15,12 +15,12 @@ meetingsRouter.get('/', (req, res, next) => {
 
 meetingsRouter.post('/', (req, res, next) => {
     const meeting = addToDatabase('meetings', createMeeting());
-    res.send(meeting);
+    res.status(201).send(meeting);
 });
 
 meetingsRouter.delete('/', (req, res, next) => {
     deleteAllFromDatabase('meetings');
-    res.send(204).send();
+    res.status(204).send();
 });
 
 module.exports = meetingsRouter;

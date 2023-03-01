@@ -1,4 +1,5 @@
 const ideasRouter = require('express').Router();
+const checkMillionDollarIdea = require('./checkMillionDollarIdea');
 const {
     createMeeting,
     getAllFromDatabase,
@@ -13,7 +14,7 @@ ideasRouter.get('/', (req, res, next) => {
     res.send(getAllFromDatabase('ideas'));
 });
 
-ideasRouter.post('/', (req, res, next) => {
+ideasRouter.post('/', checkMillionDollarIdea, (req, res, next) => {
     const idea = addToDatabase('ideas', req.body);
     res.status(201).send(idea);
 });
@@ -23,22 +24,27 @@ ideasRouter.get('/:ideaId', (req, res, next) => {
     if (idea) {
         res.send(idea);
     } else {
-        res.status(204).send();
+        res.status(404).send();
     }
 });
 
 ideasRouter.put('/:ideaId', (req, res, next) => {
     const updatedIdea = updateInstanceInDatabase('ideas', req.body);
-    res.send(updatedIdea);
+    if (updatedIdea) {
+        res.send(updatedIdea);
+    } else {
+        res.status(404).send();
+    }
 });
 
 ideasRouter.delete('/:ideaId', (req, res, next) => {
-    const idea = deleteFromDatabasebyId('ideas', req.params.ideaId);
-    if (idea) {
+    const deleted = deleteFromDatabasebyId('ideas', req.params.ideaId);
+    if (deleted) {
         res.status(204).send();
     } else {
-        res.status(500).send();
+        res.status(404).send();
     }
+
 });
 
 module.exports = ideasRouter;
