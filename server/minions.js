@@ -46,3 +46,57 @@ minionsRouter.delete('/:minionId', (req, res, next) => {
         res.status(404).send();
     }
 });
+
+// Bonus Challenge
+
+minionsRouter.get('/:minionId/work', (req, res, next) => {
+    const minionId = req.params.minionId;
+    const minion = getFromDatabaseById('minions', req.params.minionId);
+    if (isNaN(minionId)) {
+        res.status(404).send();
+    }
+    const work = getAllFromDatabase('work').filter(item => {
+        return item.minionId === minionId;
+    });
+
+    if (work && minion) {
+        res.send(work);
+    } else {
+        res.status(404).send();
+    }
+});
+
+minionsRouter.post('/:minionId/work', (req, res, next) => {
+    const work = req.body;
+    work.minionId = req.params.minionId;
+    const minionWork = addToDatabase('work', work);
+    res.status(201).send(minionWork);
+});
+
+minionsRouter.param('workId', (req, res, next, id) => {
+    const work = getFromDatabaseById('work', id);
+    if (work) {
+        req.work = work;
+        next();
+    } else {
+        res.status(404).send();
+    }
+})
+
+minionsRouter.put('/:minionId/work/:workId', (req, res, next) => {
+    if (req.params.minionId !== req.body.minionId) {
+        res.status(400).send();
+    } else {
+        const updatedWork = updateInstanceInDatabase('work', req.body);
+        res.send(updatedWork);
+    }
+});
+
+minionsRouter.delete('/:minionId/work/:workId', (req, res, next) => {
+    const deleted = deleteFromDatabasebyId('work', req.params.workId);
+    if (deleted) {
+        res.status(204).send();
+    } else {
+        res.status(404).send();
+    }
+});
